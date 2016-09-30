@@ -1,0 +1,119 @@
+{% extends 'aristotle_mdr/base.html' %}
+{% load i18n %}
+
+{% block title %}Data dictionary upload complete{% endblock %}
+
+{% block extra_head_scripts %}
+<style>
+    .dictionary textarea, .dictionary input {
+        max-width:100%;
+    }
+    .dictionary textarea {
+        max-height:80px;
+    }
+    .dictionary td {
+        max-width:100px;
+        min-width:100px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Congratulations your data dictionary has been uploaded!</h1>
+
+<p>You can view your metadata <a href="">in your sandbox</a> and a preview of it appears below:</p>
+
+<blockquote>
+    <h3>{{ saved_details.data_dictionary.name}}</h3>
+    <p>
+        {{ saved_details.data_dictionary.definition}}
+        <!--
+        This Data dictionary contains metadata records for the Australian Securities and
+        Investments Commision describing the ASIC Licences Dataset published on data.gov.au.
+        -->
+    </p>
+</blockquote>
+<p>
+    The following metadata items were created for you:
+    <ul>
+    {% with de_count=saved_details.data_elements|length %}
+    {% if de_count > 0 %}
+    <li>{{de_count}} Data Element{{de_count|pluralize }}
+        <ul>
+            {% for de in saved_details.data_elements %}
+            <li><a href="{{de.get_absolute_url}}">{{de.name}}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endif %}
+    {% endwith %}
+
+    {% with dec_count=saved_details.data_element_concepts|length %}
+    {% if dec_count > 0 %}
+    <li>{{dec_count}} Data Element Concept{{dec_count|pluralize }}
+        <ul>
+            {% for dec in saved_details.data_element_concepts %}
+            <li><a href="{{de.get_absolute_url}}">{{dec.name}}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endif %}
+    {% endwith %}
+    
+    {% with oc_count=saved_details.object_classes|length %}
+    {% if oc_count > 0 %}
+    <li>{{oc_count}} Object Class{{oc_count|pluralize:"es"}}</li>
+    {% endif %}
+    {% endwith %}
+
+    {% with pr_count=saved_details.properties|length %}
+    {% if pr_count > 0 %}
+    <li>{{pr_count}} Propert{{pr_count|pluralize:"y,ies"}}</li>
+    {% endif %}
+    {% endwith %}
+
+    {% with dt_count=saved_details.data_types|length %}
+    {% if dt_count > 0 %}
+    <li>{{dt_count}} Data type{{dt_count|pluralize:"y,ies"}}</li>
+    {% endif %}
+    {% endwith %}
+
+    </ul>
+</p>
+
+<h3>Ways to improve your metadata even further:</h3>
+<ul>
+    {% if saved_details.object_classes|length > 0 %}
+    <li>Add a definition to the following <i>object class{{saved_details.object_classes|length|pluralize:"es"}}</i>:
+        <ul>
+            {% for oc in saved_details.object_classes %}
+            <li><a href="{{oc.get_absolute_url}}">{{oc.name}}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endif %}
+    {% if saved_details.properties|length > 0 %}
+    <li>Add a definition to the following <i>propert{{saved_details.properties|length|pluralize:"y,ies"}}</i>:
+        <ul>
+            {% for pr in saved_details.properties %}
+            <li><a href="{{pr.get_absolute_url}}">{{pr.name}}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endif %}
+    <li>Add a definition to the following <i>data element concept{{saved_details.data_element_concepts|length|pluralize}}</i>:
+        <ul>
+            {% for dec in saved_details.data_element_concepts %}
+            <li><a href="{{dec.get_absolute_url}}">{{dec.name}}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+    <li>Add a definition to the following <i>data type{{saved_details.data_types|length|pluralize}}</i>:
+        <ul>
+            {% for dt in saved_details.data_types %}
+            <li><a href="{{dt.get_absolute_url}}">{{dt.name}}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+</ul>
+{% endblock %}

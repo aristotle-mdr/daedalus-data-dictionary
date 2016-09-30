@@ -1,0 +1,78 @@
+{% extends 'daedalus/uploader/wizard/base.html' %}
+{% load i18n %}
+
+{% block extra_head_scripts %}
+{{ wizard.form.media }}
+<style>
+    .dictionary select2-container {
+        width: 100% !important;
+    }
+    .dictionary .select2-selection  {
+        overflow: hidden;
+    }
+    li.form {
+        display: table-row;
+    }
+    li.form > * {
+        display:table-cell;
+        padding:5px;
+    }
+    label {
+        vertical-align: top;
+    }
+    .dictionary textarea {
+        height: 5em;
+    }
+    .dictionary textarea,.dictionary input {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block wizard_preamble %}
+<p>
+    The fields below match entries from your data dictionary to 
+    metadata that already exists in the registry. In this step, select all those that match
+    and leave any fields blank to create new metadata in the next step.
+</p>
+<p>
+    If none of the results are suitable for your purpose, leave the field blank and new metadata
+    will be created.
+</p>
+{% endblock %}
+
+{% block wizard_content %}
+{{ wizard.form.management_form }}
+{% with formset=wizard.form %}
+    {{ formset.non_form_errors.as_ul }}
+    <div class="row"><div class="col-xs-12">
+    <ul id="formset" class="formset dictionary">
+    {% for form in formset.forms %}
+      <li class="{% cycle row1,row2 %}">
+      {% if form.nope %}
+        Skipping this row!                  
+      {% else %}
+      <ul class="well">
+          {% for field in form.visible_fields %}
+            <li class="form">
+            {# Include the hidden fields in the form #}
+            {% if forloop.first %}
+              {% for hidden in form.hidden_fields %}
+              {{ hidden }}
+              {% endfor %}
+            {% endif %}
+              {{ field.errors.as_ul }}
+              <label>{{ field.label|capfirst }}</label>
+              <div>{{ field }}
+              <div>{{field.help_text}}</div>
+              </div>
+            </li>
+          {% endfor %}
+      </ul>
+      {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+    </div></div>
+{% endwith %}
+{% endblock %}

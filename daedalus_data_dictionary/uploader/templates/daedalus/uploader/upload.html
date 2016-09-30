@@ -1,0 +1,26 @@
+{% extends 'aristotle_mdr/base.html' %}
+{% load data_interrogator_tags %}
+{% load aristotle_tags %}
+
+{% block title %}Metadata interrogator{% endblock %}
+
+{% block content %}
+{% block extra_head_scripts %}
+
+<!-- for fancy tables -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/extensions/filter-control/bootstrap-table-filter-control.js"></script>
+<script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"></script>
+
+<script src="//rawgit.com/kayalshri/tableExport.jquery.plugin/master/jquery.base64.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/extensions/export/bootstrap-table-export.js"></script>
+{% endblock %}
+
+<div class="container">
+<div class="row">
+        {% include "data_interrogator/lineup.html" %}
+        {% include "data_interrogator/interrogation_room.html" %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'aristotle_mdr/base.html' %}
+{% load i18n %}
+
+{% block title %}Data dictionary uploader{% endblock %}
+
+{% block extra_head_scripts %}
+{{ wizard.form.media }}
+<style>
+    .dictionary textarea, .dictionary input {
+        max-width:100%;
+    }
+    .dictionary textarea {
+        max-height:80px;
+    }
+    .dictionary td {
+        max-width:100px;
+        min-width:100px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Data dictionary upload wizard - <small>Step {{ wizard.steps.step1 }} of {{ wizard.steps.count }}</small></h1>
+
+<div class="progress">
+  <div class="progress-bar" role="progressbar" aria-valuenow="{{ wizard.steps.step1 }}" aria-valuemin="0" aria-valuemax="{{wizard.steps.count}}" style="width: {{percent_complete}}%;">
+    {# No need for an inner screen reader value as it would be the same as the 'step 1 of n' description above. #}
+    {#<span class="sr-only">{{percent_complete}}% Complete</span>#}
+  </div>
+</div>
+
+{% block wizard_preamble %}
+{% endblock %}
+
+<form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+{{ wizard.management_form }}
+
+{% block wizard_content %}
+{% endblock %}
+
+{% if wizard.steps.prev %}
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+<button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+{% endif %}
+<input type="submit" value="{% trans "submit" %}"/>
+</form>
+{% endblock %}
