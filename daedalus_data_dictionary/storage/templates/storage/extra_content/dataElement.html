@@ -1,0 +1,15 @@
+{% load aristotle_tags %}
+
+{% if item.dictionary_inclusions.exists %}
+<h3>Included in the following data dictionaries</h3>
+<ul>
+    {% for inc in item.dictionary_inclusions.all %}
+        <li>
+        <a href="{{inc.dictionary.get_absolute_url}}">{{inc.dictionary.name}}</a>
+        <div>
+            <em>Context:</em> {{inc.context}}
+        </div>
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}

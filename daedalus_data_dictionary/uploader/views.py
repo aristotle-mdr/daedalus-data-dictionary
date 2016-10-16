@@ -110,10 +110,22 @@ class DataDictionaryUploader(SessionWizardView):
             'data_elements':[],
             'data_element_concepts':[],
         }
-        #Save everything!
-        details['data_dictionary']['name'] = self.get_cleaned_data_for_step('0')['name']
-        details['data_dictionary']['definition'] = self.get_cleaned_data_for_step('0')['definition']
+        # Now, lets save everything!
         
+        if 'daedalus_data_dictionary.storage' in settings.INSTALLED_APPS:
+            from daedalus_data_dictionary.storage import models as DDM
+            dd = DDM.DataDictionary.objects.create(
+                name = self.get_cleaned_data_for_step('0')['name'], 
+                definition = self.get_cleaned_data_for_step('0')['definition'],
+                origin_file = self.storage.get_step_files('0')['0-data_dictionary']
+            )
+            details['data_dictionary'] = dd
+        else:
+            details['data_dictionary'] = {
+                'name': self.get_cleaned_data_for_step('0')['name'], 
+                'definition': self.get_cleaned_data_for_step('0')['definition'],
+            }
+
         # names that were used to create objects
         names = {
             'object_classes':{},
@@ -224,6 +236,16 @@ class DataDictionaryUploader(SessionWizardView):
                     names['data_elements'][values['name']] = de
                 else:
                     de = names['data_elements'][values['name']]
+            else:
+                de = elems['data_element']
+
+            if 'daedalus_data_dictionary.storage' in settings.INSTALLED_APPS:
+                di = DDM.DataDictionaryInclusion.objects.create(
+                    dictionary=dd,
+                    included_concept=de,
+                    context="Column name: %s"%values['column'],
+                    # preferred_column_name=values['column']
+                )
 
 
         return render(self.request, 'daedalus/uploader/wizard/4_done.html', {

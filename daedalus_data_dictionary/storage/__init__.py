@@ -1,0 +1,1 @@
+default_app_config = 'daedalus_data_dictionary.storage.apps.DaedalusStorageConfig'

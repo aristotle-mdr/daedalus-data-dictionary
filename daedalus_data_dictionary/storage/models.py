@@ -7,70 +7,47 @@ from model_utils import Choices
 from aristotle_mdr.models import RichTextField
 import aristotle_mdr as aristotle
 
-class RegisteredDataSet(aristotle.models.concept):
+class DataDictionary(aristotle.models.concept):
     """
-    A registered dataset
     """
-    template = "magda_data_registry/registereddataset.html"
-#    name = models.CharField(max_length=256, null=False, blank=False)  # shortname
-#    title = models.CharField(max_length=256, null=False, blank=False)  # name
-    jurisdiction = models.TextField()
-    license_title = models.TextField()
-    spatial_coverage = models.TextField()
-    author = models.TextField()
-    temporal_coverage_from = models.CharField(max_length=256, blank=True)
-    notes = models.TextField()
-    data_state = models.CharField(max_length=256, blank=True)
-    where_to_get = models.TextField()
-    # owner = models.ForeignKey(
-    #     Organisation,  # RegistrationAuthority
-    # )
-    language = models.CharField(max_length=256, blank=True)
-
-    @property
-    def registry_cascade_items(self):
-        from aristotle_mdr import models
-        return list(self.resources.all())+list(
-            models.DataElement.objects.filter(columns__dataset=self)
-        )+list(
-            models.ValueDomain.objects.filter(dataelement__columns__dataset=self)
-        )
-
-class DataSetResource(aristotle.models.concept):
-    # name = models.CharField(max_length=256, blank=True)
-    # description = models.TextField()
-    template = "magda_data_registry/dataresource.html"
-    url = models.TextField()
-    position = models.PositiveIntegerField()
-    filetype = models.CharField(max_length=256, blank=True)
-
-    dataset = models.ForeignKey(
-        RegisteredDataSet,
-        related_name="resources"
+    template = "daedalus/storage/datadictionary.html"
+    origin_file = models.FileField(
+        help_text=_("If this data dictionary was part of a bulk upload, a copy of the file used to create it."),
+        blank=True, null=True
     )
-    data_elements = models.ManyToManyField(
-        aristotle.models.DataElement,
-        related_name='columns',
-        through='DataSetResourceColumn'
+    included_concepts = models.ManyToManyField(
+        aristotle.models._concept,
+        related_name='dictionaries',
+        through='DataDictionaryInclusion',
+        blank=True, null=True
     )
 
-class DataSetResourceColumn(aristotle.models.aristotleComponent):
-    class Meta:
-        ordering = ['order']
+class DataDictionaryInclusion(aristotle.models.aristotleComponent):
 
     @property
     def parentItem(self):
-        return self.resource
+        return self.dictionary
 
-    data_element = models.ForeignKey(aristotle.models.DataElement)
-    resource = models.ForeignKey(DataSetResource)
-    column_name = models.CharField(
-        max_length=256,
-        help_text=_("The name of this data element as a column in the dataset.")
-        )
-    order = models.PositiveSmallIntegerField(
+    included_concept = models.ForeignKey(aristotle.models._concept, related_name='dictionary_inclusions')
+    dictionary = models.ForeignKey(DataDictionary)
+    context = models.TextField(
+        null=True, blank=True,
+        help_text=_("Additional context for the use of this concept within the data dictionary.")
+    )
+    # preferred_column_name = models.TextField(
+    #     null=True, blank=True,
+    #     help_text=_("Additional context for the use of this concept within the data dictionary.")
+    # )
+    # order = models.PositiveSmallIntegerField(
+    #     "Position",
+    #     null=True,
+    #     blank=True,
+    #     help_text=_("Position within a dictionary.")
+    # )
+    cascade = models.BooleanField(
         "Position",
-        null=True,
-        blank=True,
-        help_text=_("Column position within a dataset.")
-        )
+        default=True,
+        help_text=_(
+            "If selected, this concept and all its components will be in the dictionary."
+            "Otherwise only this concept will be in the dictionary.")
+    )

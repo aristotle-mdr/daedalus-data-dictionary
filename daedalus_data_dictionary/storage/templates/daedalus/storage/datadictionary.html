@@ -1,0 +1,36 @@
+{% extends "aristotle_mdr/concepts/managedContent.html" %}
+{% load aristotle_tags util_tags i18n %}
+
+{% block objSpecific %}
+<h2>Concepts included in this dictionary</h2>
+
+    {% if item|can_edit:request.user %}
+        <a href="{% url 'data_dictionary_edit' iid=item.id %}"
+            data-toggle="modal" data-target="#addClusterstoDSS"
+            class="btn btn-default btn-sm">
+            <i class="fa fa-plus"></i>
+            Add/remove entries in this dictionary
+        </a>
+    {% endif %}
+    {% if item.datadictionaryinclusion_set.exists %}
+        <ul>
+            {% for conc in item.datadictionaryinclusion_set.all|order_by:"included_concept__name" %}
+            <li>
+                <div>
+                {% include "aristotle_mdr/helpers/itemLink.html" with item=conc.included_concept %}
+                </div>
+                <div>
+                {{ conc.context }}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="well well-lg">No concepts have been assigned to this data dictionary.</div>
+        {% if item|can_edit:request.user %}
+        <div class="btn-group pull-right" role="group" aria-label="Dataset actions">
+        </div>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

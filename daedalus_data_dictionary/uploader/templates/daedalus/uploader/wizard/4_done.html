@@ -24,7 +24,7 @@
 <p>You can view your metadata <a href="">in your sandbox</a> and a preview of it appears below:</p>
 
 <blockquote>
-    <h3>{{ saved_details.data_dictionary.name}}</h3>
+    <h3><a href="{{saved_details.data_dictionary.get_absolute_url}}">{{ saved_details.data_dictionary.name}}</a></h3>
     <p>
         {{ saved_details.data_dictionary.definition}}
         <!--
