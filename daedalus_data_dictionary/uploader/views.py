@@ -1,8 +1,10 @@
 import os
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.shortcuts import redirect, render, get_object_or_404
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 
 from formtools.wizard.views import SessionWizardView
@@ -265,6 +267,7 @@ class DataDictionaryUploader(SessionWizardView):
         
         return context
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         self.request = request
         return super(DataDictionaryUploader, self).dispatch(request, *args, **kwargs)
