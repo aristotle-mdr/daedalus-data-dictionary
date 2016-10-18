@@ -63,18 +63,33 @@
     {% with oc_count=saved_details.object_classes|length %}
     {% if oc_count > 0 %}
     <li>{{oc_count}} Object Class{{oc_count|pluralize:"es"}}</li>
+        <ul>
+            {% for oc in saved_details.object_classes %}
+            <li><a href="{{oc.get_absolute_url}}">{{oc.name}}</a></li>
+            {% endfor %}
+        </ul>
     {% endif %}
     {% endwith %}
 
     {% with pr_count=saved_details.properties|length %}
     {% if pr_count > 0 %}
     <li>{{pr_count}} Propert{{pr_count|pluralize:"y,ies"}}</li>
+        <ul>
+            {% for pr in saved_details.properties %}
+            <li><a href="{{pr.get_absolute_url}}">{{pr.name}}</a></li>
+            {% endfor %}
+        </ul>
     {% endif %}
     {% endwith %}
 
     {% with dt_count=saved_details.data_types|length %}
     {% if dt_count > 0 %}
-    <li>{{dt_count}} Data type{{dt_count|pluralize:"y,ies"}}</li>
+    <li>{{dt_count}} Data type{{dt_count|pluralize }}</li>
+        <ul>
+            {% for dt in saved_details.data_types %}
+            <li><a href="{{dt.get_absolute_url}}">{{dt.name}}</a></li>
+            {% endfor %}
+        </ul>
     {% endif %}
     {% endwith %}
 

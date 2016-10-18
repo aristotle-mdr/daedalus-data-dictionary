@@ -52,7 +52,7 @@ def data_dictionary_to_property_queryset(**kwargs):
 def data_dictionary_to_datatype_queryset(**kwargs):
     queries = Q()
     user = kwargs.get('__user__', None)
-    tokens = kwargs['datatype'].split(' ')
+    tokens = kwargs['data_type'].split(' ')
 
     for token in tokens:
         token = token.strip()

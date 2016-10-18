@@ -32,30 +32,36 @@ class DataDictionaryUploader(SessionWizardView):
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'data_dictionaries'))
     template_name = "daedalus/uploader/wizard/1_upload.html"
 
+    fieldnames = [
+        'name',
+        'definition',
+        'object_name',
+        'property_name',
+        'value_domain_description',
+        'data_type',
+        'maximum_length',
+        'format_field',
+        'column',
+        'notes',
+    ]
+
+    def get_dict_from_file(self):
+        upload = self.storage.get_step_files('0')['0-data_dictionary'] #.read()
+
+        reader = csv.DictReader(upload, fieldnames=self.fieldnames)
+        reader = list(reader)
+        # Skip header (its mandatory)
+        return reader[1:]
+
     def get_template_names(self):
         return [self.template_list[int(self.steps.current)]]
 
     def get_form_kwargs(self, step):
         kwargs = super(DataDictionaryUploader, self).get_form_kwargs(step)
         if int(step) == 1:
-            upload = self.storage.get_step_files('0')['0-data_dictionary'] #.read()
-            fieldnames = [
-                'name',
-                'definition',
-                'object_name',
-                'property_name',
-                'value_domain_description',
-                'datatype',
-                'maximum_length',
-                'format_field',
-                'column',
-                'notes',
-            ]
-            reader = csv.DictReader(upload, fieldnames=fieldnames)
-            querysets = []
             help_texts = []
             rows = []
-            for row in reader:
+            for row in self.get_dict_from_file():
                 help_texts.append(row['name'])
                 rows.append(row)
             kwargs.update({'rows':rows, 'user':self.request.user})
@@ -69,35 +75,13 @@ class DataDictionaryUploader(SessionWizardView):
     def get_form_initial(self, step, **kwargs):
         initial = super(DataDictionaryUploader, self).get_form_initial(step)
 
-        fieldnames = [
-            'name',
-            'definition',
-            'object_name',
-            'property_name',
-            'value_domain_description',
-            'datatype',
-            'maximum_length',
-            'format_field',
-            'column',
-            'notes',
-        ]
-
         if int(step) == 1:
-            upload = self.storage.get_step_files('0')['0-data_dictionary'] #.read()
-            reader = csv.DictReader(upload, fieldnames=fieldnames)
             initial = []
-            next(reader)  # Skip header (its mandatory)
-            for row in reader:
+            for row in self.get_dict_from_file():
                 initial.append({'nope': False})
         elif int(step) == 2:
-            # num_of_dates =  self.get_cleaned_data_for_step(str(int(step) - 1))['date'].split(',')
-            # form_class.extra = len(num_of_dates)-1
-            upload = self.storage.get_step_files('0')['0-data_dictionary'] #.read()
-            reader = csv.DictReader(upload, fieldnames=fieldnames)
             initial = []
-            next(reader)  # Skip header (its mandatory)
-            for row in reader:
-                print row
+            for row in self.get_dict_from_file():
                 initial.append(row)
         return initial
     
@@ -119,7 +103,8 @@ class DataDictionaryUploader(SessionWizardView):
             dd = DDM.DataDictionary.objects.create(
                 name = self.get_cleaned_data_for_step('0')['name'], 
                 definition = self.get_cleaned_data_for_step('0')['definition'],
-                origin_file = self.storage.get_step_files('0')['0-data_dictionary']
+                origin_file = self.storage.get_step_files('0')['0-data_dictionary'],
+                submitter=self.request.user
             )
             details['data_dictionary'] = dd
         else:
@@ -142,8 +127,7 @@ class DataDictionaryUploader(SessionWizardView):
             if elems.get('nope', False):
                 # Skip rows when instructed
                 continue
-            print 'elems=',elems
-            print 'values=',values
+
             if values.get('object_name', None):
                 if values['object_name'] not in names['object_classes'].keys():
                     oc = models.ObjectClass.objects.create(
@@ -189,11 +173,10 @@ class DataDictionaryUploader(SessionWizardView):
             if any(values.get(val, None) for val in [
                 'value_domain_description', 'maximum_length', 'format_field'
             ]):
-                vd_name = "Value domain for %s"
                 if elems.get('data_element', None):
                     postfix = elems.get('data_element').name
-                elif 'data_element' in values.keys():
-                    postfix = values.get('data_element')
+                elif 'name' in values.keys():
+                    postfix = values.get('name')
                 else:
                     # Don't think we will ever get here, but just in case
                     postfix = 'uploaded data element in data dictionary'
@@ -226,8 +209,13 @@ class DataDictionaryUploader(SessionWizardView):
                     dec.save()
                     details['data_element_concepts'].append(dec)
                     
+                    if dt:
+                        de_name = '%s-%s, %s' % (oc.name, pr.name, dt.name)
+                    else:
+                        de_name = '%s-%s' % (oc.name, pr.name)
                     de = models.DataElement(
-                        name=values['object_name'],
+                        name=de_name,
+                        short_name=values['name'],
                         definition='',
                         submitter=self.request.user
                     )
@@ -260,9 +248,21 @@ class DataDictionaryUploader(SessionWizardView):
 
         if int(self.steps.current) == 2:
             context.update({'selected': self.get_cleaned_data_for_step('1')})
-        
+
+        if int(self.steps.current) > 0:
+            upload = self.storage.get_step_files('0')['0-data_dictionary'] #.read()
+            reader = list(csv.reader(upload)) #, fieldnames=self.fieldnames))
+            header = reader[0]
+            rows = reader[1:]
+            context.update({
+                'header': header,
+                'rows': rows
+            })
+
+
         context.update({
-            'percent_complete': 100*int(self.steps.step0) / int(self.steps.count)
+            'percent_complete': 100*int(self.steps.step0) / int(self.steps.count),
+            
         })
         
         return context

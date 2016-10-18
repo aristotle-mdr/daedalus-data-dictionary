@@ -52,7 +52,7 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
         label=_("We're going to override this"),
         required=False
     )
-    datatype = forms.BooleanField(
+    data_type = forms.BooleanField(
         label=_("We're going to override this"),
         required=False
     )
@@ -74,19 +74,22 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
         pr_qs = utils.data_dictionary_to_property_queryset(__user__=self.user, **self.row)
         dt_qs = utils.data_dictionary_to_datatype_queryset(__user__=self.user, **self.row)
         
-        self.fields['data_element'] = forms.ModelChoiceField(
-            queryset=de_qs,
-            required=False,
-            empty_label="None",
-            label=_("Data element"),
-            help_text='%s %s' % (self.row['name'], self.row['definition'][:50]),
-            widget=DynamicConceptAutocompleteSelect(
-                qs_uuid=utils.register_queryset(de_qs),
-                model=models.DataElement
-            ),
-            initial=de_qs.first().pk if de_qs.first() else None
-        )
-        
+        if de_qs:
+            self.fields['data_element'] = forms.ModelChoiceField(
+                queryset=de_qs,
+                required=False,
+                empty_label="None",
+                label=_("Data element"),
+                help_text='%s %s' % (self.row['name'], self.row['definition'][:50]),
+                widget=DynamicConceptAutocompleteSelect(
+                    qs_uuid=utils.register_queryset(de_qs),
+                    model=models.DataElement
+                ),
+                initial=de_qs.first().pk if de_qs.first() else None
+            )
+        else:
+            self.fields.pop('data_element')
+
         if oc_qs.exists():
             self.fields['object_class'] = forms.ModelChoiceField(
                 queryset=oc_qs,
@@ -120,12 +123,12 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
             self.fields.pop('property')
 
         if dt_qs.exists():
-            self.fields['datatype'] = forms.ModelChoiceField(
+            self.fields['data_type'] = forms.ModelChoiceField(
                 queryset=dt_qs,
                 required=False,
                 empty_label="None",
                 label=_("Data Type"),
-                help_text=self.row['datatype'],
+                help_text=self.row['data_type'],
                 widget=DynamicConceptAutocompleteSelect(
                     qs_uuid=utils.register_queryset(dt_qs),
                     model=models.DataType
@@ -133,7 +136,7 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
                 initial=dt_qs.first().pk
             )
         else:
-            self.fields.pop('datatype')
+            self.fields.pop('data_type')
 
         if vd_qs.exists():
             self.fields['value_domain'] = forms.ModelChoiceField(
@@ -234,7 +237,7 @@ class DataDictionaryUploader_Part3_ConfirmStuff(forms.Form):
                 self.fields.pop('value_domain_description')
                 self.fields.pop('maximum_length')
                 self.fields.pop('format_field')
-            if self.selected.get('datatype'):
+            if self.selected.get('data_type'):
                 self.fields.pop('data_type')
             if self.selected.get('object'):
                 self.fields.pop('object_name')

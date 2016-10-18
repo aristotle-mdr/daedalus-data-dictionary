@@ -1,5 +1,5 @@
 {% extends 'daedalus/uploader/wizard/base.html' %}
-{% load i18n %}
+{% load i18n daedalus_tags %}
 
 {% block extra_head_scripts %}
 {{ wizard.form.media }}
@@ -42,6 +42,24 @@
     {% for form in formset.forms %}
       <li class="{% cycle row1,row2 %}">
           <ul class="well">
+              <small>
+              <table class="table">
+                  <thead>
+                        <tr>
+                            {% for head in header %}
+                            <th>{{head}}</th>
+                            {% endfor %}
+                        </tr>
+                  </thead>
+                  <tbody>
+                        <tr>
+                            {% for col in rows|list_elem:forloop.counter0 %}
+                            <td>{{col}}</td>
+                            {% endfor %}
+                        </tr>
+                  </tbody>
+              </table>
+              </small>
       {% for field in form.visible_fields %}
         <li class="form">
         {# Include the hidden fields in the form #}
