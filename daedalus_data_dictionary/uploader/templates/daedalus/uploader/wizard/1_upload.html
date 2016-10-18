@@ -2,6 +2,13 @@
 {% load i18n %}
 
 {% block wizard_content %}
+<p>This form helps you bulk upload metadata using a simple CSV data dictionary format.</p>
+<p>
+To get started <a href="{{ STATIC_URL }}/uploader/blank-data-dictionary-format.csv">download this template and fill in the fields to describe your metadata</a>.
+</p>
+<p>
+  A list of fields and their description is at the bottom of the page.
+</p>
 
 {% if wizard.form.forms %}
 {{ wizard.form.management_form }}
@@ -39,5 +46,88 @@
     {{ wizard.form }}
 </table>
 {% endif %}
+
+<dl class="row">
+</dd>
+<dt class="col-sm-offset-1 col-sm-offset-1 col-sm-2">Name</dt>
+<dd class="col-sm-9"><p>The preferred designation by which a data element is known within the context of this data dictionary.
+<br>
+This field is based on the field described by <em>"AS4590-2016 - 1.4.2 Name"</em>.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as a 
+Data Element and Data Element Concept name.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Definition</dt>
+<dd class="col-sm-9"><p>A statement that expresses the essential nature of the data element 
+and its differentiation from all other data elements.
+<br>
+This field is based on the field described by <em>"AS4590-2016 - 1.4.3 Definition"</em>.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as a Data Element and 
+Data Element Concept definition. 
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Object</dt>
+<dd class="col-sm-9"><p>The common name of the object that the data element records data about; 
+for example a Person, Event, Location or Object.
+<br>
+Including an Object Class name helps when finding similar content within a data registry by group
+data about similar classes of object.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as an Object Class name.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Property</dt>
+<dd class="col-sm-9"><p>The common name of the attribute of an object that the data element records data about.
+The name of the attribute should be independent of how it is recorded - for example <em>"Age"</em>, not <em>"Age in years"</em>.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as an Property name.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Value domain description</dt>
+<dd class="col-sm-9"><p>The set of representations of permissible instances of the data element, according to the
+representational class, representation layout, data type and maximum size specified in the
+corresponding metadata components. The set can be specified by name (including an
+existing classification/code scheme such as ABS 1292.0 (ANZSIC), by reference to a full
+code list included as an Appendix (such as the Name Title in Appendix A, Table A1), or by
+enumeration of the representation of the instances (e.g. permissible values for sex as
+described below).
+<br>
+
+This field is based on the field described by <em>"AS4590-2016 - 1.4.9 Domain values"</em>.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as a the Value Domain definition.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Data Type</dt>
+<dd class="col-sm-9"><p>The common name of the data type that is used to record information for this data. Where possible use broad names for data type rather than system specific representations, eg. "Text" rather than "VARCHAR(256)".
+<br>
+This field is based on the field described by <em>"AS4590-2016 - 1.4.6 Representation Class"</em>. 
+In ISO/IEC 11179-3:2014 Data types had a change in scope and Representation classes were deprecated.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as a Data Type name.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Maximum length</dt>
+<dd class="col-sm-9"><p>The maximum number of characters that may be recorded in the field.
+<br>
+This field is based on the field described by <em>"AS4590-2016 - 1.4.7 Field size maximum"</em>.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as a the Value Domain maximum length.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Format</dt>
+<dd class="col-sm-9"><p>Detail on the format of data recorded for this data element. It is recommended that this format conforms to a known language such as "Regular expressions' of the Representation layout specified in Australian Standard 'AS 4590-2016, 1.4.8'.
+<br>
+This field is based on the field described by <em>"AS4590-2016 - 1.4.8 Representation layout</em>.
+<br>
+When imported into an Aristotle Metadata Registry this value will be stored as a the Value Domain format.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Column</dt>
+<dd class="col-sm-9"><p>	When recording a data dictionary against a particular data collection, 
+this specifies the name of a column used in a particular dataset that this data element corresponds with.
+</dd>
+<dt class="col-sm-offset-1 col-sm-2">Notes</dt>
+<dd class="col-sm-9"><p>When recording a data dictionary against a particular data collection, 
+this records additional context for this specific column within the dataset.
+<br>
+For example, if two columns in a dataset record a data element at two different places or two different 
+points in time, the notes may be used to describe the additional context for each column.
+</dd>
+</dl>
 
 {% endblock %}
