@@ -12,13 +12,38 @@ import csv
 from aristotle_mdr.contrib.autocomplete import widgets
 from daedalus_data_dictionary.uploader import utils 
 
-
 class DataDictionaryUploader_Part1_NameAndUpload(forms.Form):
-    name = forms.CharField(max_length=100)
-    data_dictionary = forms.FileField(help_text=_("Select a data dictionary to upload."))
-    definition = forms.CharField(widget=forms.Textarea, required=False)
+    name = forms.CharField(
+        max_length=100,
+        help_text=_('The name of the data dictionary')
+    )
+    data_dictionary = forms.FileField(help_text=_("Select a data dictionary CSV file to upload."))
+    definition = forms.CharField(
+        widget=forms.Textarea, required=False,
+        help_text=_('Give a breif description of the data dictionary')
+    )
+    distribution = forms.BooleanField(
+        label=_("We're going to override this"),
+        required=False
+    )
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(DataDictionaryUploader_Part1_NameAndUpload, self).__init__(*args, **kwargs)
 
-
+        try:
+            from aristotle_dse.models import Distribution
+            self.fields['distribution'] = forms.ModelChoiceField(
+                queryset=Distribution.objects.visible(self.user),
+                required=False,
+                empty_label="None",
+                label=_("Data distribution"),
+                help_text='To attach these records to a data distribution select it and the fields in the dictionary will be mapped to data elements',
+                widget=widgets.ConceptAutocompleteSelect(
+                    model=Distribution
+                )
+            )
+        except:
+            self.fields.pop('distribution')
 
 class DynamicConceptAutocompleteSelect(ModelSelect2):
     def __init__(self, *args, **kwargs):
@@ -208,7 +233,7 @@ class DataDictionaryUploader_Part3_ConfirmStuff(forms.Form):
         super(DataDictionaryUploader_Part3_ConfirmStuff, self).__init__(*args, **kwargs)
 
         if self.selected.get('nope'):
-            # If they have a match on the data element, then everything can be ignored!
+            # If they want to ignore this column, then everything can be ignored!
             self.nope = True
             self.fields.pop('name')
             self.fields.pop('definition')
@@ -233,13 +258,14 @@ class DataDictionaryUploader_Part3_ConfirmStuff(forms.Form):
             self.fields.pop('object_name')
             self.fields.pop('property_name')
         else:
+            print "3", self.selected
             if self.selected.get('value_domain'):
                 self.fields.pop('value_domain_description')
                 self.fields.pop('maximum_length')
                 self.fields.pop('format_field')
             if self.selected.get('data_type'):
                 self.fields.pop('data_type')
-            if self.selected.get('object'):
+            if self.selected.get('object_class'):
                 self.fields.pop('object_name')
             if self.selected.get('property'):
                 self.fields.pop('property_name')
@@ -260,7 +286,7 @@ class DataDictionaryUploader_Part3_ConfirmStuffFormSet(BaseFormSet):
 
     def __init__(self, *args, **kwargs):
         self.selected = kwargs.pop('selected')
-        # self.user = kwargs.pop('user')
+        self.user = kwargs.pop('user')
         super(DataDictionaryUploader_Part3_ConfirmStuffFormSet, self).__init__(*args, **kwargs)
 
     @cached_property

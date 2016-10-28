@@ -10,42 +10,9 @@ To get started <a href="{{ STATIC_URL }}/uploader/blank-data-dictionary-format.c
   A list of fields and their description is at the bottom of the page.
 </p>
 
-{% if wizard.form.forms %}
-{{ wizard.form.management_form }}
-    {% with formset=wizard.form %}
-        {{ formset.non_form_errors.as_ul }}
-        <table id="formset" class="form table dictionary">
-        {% for form in formset.forms %}
-          {% if forloop.first %}
-          <thead><tr>
-            {% for field in form.visible_fields %}
-            <th>{{ field.label|capfirst }}</th>
-            {% endfor %}
-          </tr></thead>
-          {% endif %}
-          <tr class="{% cycle row1,row2 %}">
-          {% for field in form.visible_fields %}
-            <td>
-            {# Include the hidden fields in the form #}
-            {% if forloop.first %}
-              {% for hidden in form.hidden_fields %}
-              {{ hidden }}
-              {% endfor %}
-            {% endif %}
-              {{ field.errors.as_ul }}
-              {{ field }}
-              {{field.help_text}}
-            </td>
-          {% endfor %}
-          </tr>
-        {% endfor %}
-        </table>
-        {% endwith %}
-{% else %}
-    <table class='table'>
+<table class='table'>
     {{ wizard.form }}
 </table>
-{% endif %}
 
 {% endblock %}
 

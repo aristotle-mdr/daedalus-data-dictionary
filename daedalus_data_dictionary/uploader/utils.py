@@ -66,16 +66,16 @@ def data_dictionary_to_datatype_queryset(**kwargs):
 def data_dictionary_to_value_domain_queryset(**kwargs):
     queries = Q()
     user = kwargs.get('__user__', None)
-    tokens = kwargs['value_domain_description'].split(' ')
+    tokens = [t for t in kwargs['value_domain_description'].split(' ') if len(t) > 3]
 
     for token in tokens:
         token = token.strip()
         if token:
             queries &= Q(name__icontains=token)
-    des = ValueDomain.objects.filter(queries)
+    vds = ValueDomain.objects.filter(queries)
     if user:
-        des = des.visible(user)
-    return des
+        vds = vds.visible(user)
+    return vds
 
 
 from django.db.models.fields import Field, _load_field, _empty

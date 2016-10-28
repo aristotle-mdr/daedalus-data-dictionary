@@ -64,17 +64,24 @@ class DataDictionaryUploader(SessionWizardView):
             for row in self.get_dict_from_file():
                 help_texts.append(row['name'])
                 rows.append(row)
-            kwargs.update({'rows':rows, 'user':self.request.user})
+            kwargs.update({'rows':rows})
         elif int(step) == 2:
             kwargs.update({
                 'selected':self.get_cleaned_data_for_step('1'),
                 # 'user':self.request.user
             })
+        kwargs.update({'user':self.request.user})
         return kwargs
 
     def get_form_initial(self, step, **kwargs):
         initial = super(DataDictionaryUploader, self).get_form_initial(step)
 
+        if int(step) == 0:
+            initial = {}
+            if 'distribution' in self.request.GET.keys():
+                initial = {
+                    'distribution': self.request.GET.get('distribution')
+                }
         if int(step) == 1:
             initial = []
             for row in self.get_dict_from_file():
@@ -209,7 +216,9 @@ class DataDictionaryUploader(SessionWizardView):
                     dec.save()
                     details['data_element_concepts'].append(dec)
                     
-                    if dt:
+                    if values['name']:
+                        de_name = values['name']
+                    elif dt:
                         de_name = '%s-%s, %s' % (oc.name, pr.name, dt.name)
                     else:
                         de_name = '%s-%s' % (oc.name, pr.name)
@@ -236,7 +245,16 @@ class DataDictionaryUploader(SessionWizardView):
                     context="Column name: %s"%values['column'],
                     # preferred_column_name=values['column']
                 )
-
+            if self.get_cleaned_data_for_step('0')['distribution']:
+                try:
+                    from aristotle_dse.models import DistributionDataElementPath
+                    ddep = DistributionDataElementPath.objects.create(
+                        distribution=self.get_cleaned_data_for_step('0')['distribution'],
+                        data_element=de,
+                        logical_path=values['column'],
+                    )
+                except ImportError:
+                    pass
 
         return render(self.request, 'daedalus/uploader/wizard/4_done.html', {
             'form_data': [form.cleaned_data for form in form_list],
@@ -282,4 +300,7 @@ class DDConceptAutocomplete(GenericAutocomplete):
         model = apps.get_model(self.kwargs.get('app_label'), self.kwargs.get('model_name'))
 
         qs = get_queryset_from_uuid(qs_uuid, model).visible(self.request.user)
+
+        if self.q:
+            qs = qs.filter(name__icontains=self.q)
         return qs
