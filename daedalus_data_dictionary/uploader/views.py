@@ -49,7 +49,12 @@ class DataDictionaryUploader(SessionWizardView):
         upload = self.storage.get_step_files('0')['0-data_dictionary'] #.read()
 
         reader = csv.DictReader(upload, fieldnames=self.fieldnames)
-        reader = list(reader)
+        reader = [
+            row for row in list(reader)
+            # The row is all blank, ignore it
+            if not all(map(lambda y: y.strip() == "", row.values()))
+        ]
+            
         # Skip header (its mandatory)
         return reader[1:]
 
@@ -271,7 +276,11 @@ class DataDictionaryUploader(SessionWizardView):
             upload = self.storage.get_step_files('0')['0-data_dictionary'] #.read()
             reader = list(csv.reader(upload)) #, fieldnames=self.fieldnames))
             header = reader[0]
-            rows = reader[1:]
+            rows = [
+                row for row in reader
+                # The row is not blank, yield it
+                if not all(map(lambda y: y.strip() == "", row))
+            ][1:]
             context.update({
                 'header': header,
                 'rows': rows
