@@ -41,7 +41,6 @@
     <ul id="formset" class="formset dictionary">
     {% for form in formset.forms %}
       <li class="{% cycle row1,row2 %}">
-          <ul class="well">
               <small>
               <table class="table">
                   <thead>
@@ -60,6 +59,17 @@
                   </tbody>
               </table>
               </small>
+              {% if form.visible_fields|length > 1 %}
+            <strong>Select metadata items below to link this row to existing
+            metadata records. The best matching item has been preselected.</br>
+            
+            If no correct match is found erase the option by clicking 'x'.
+            
+            </strong>
+            {% else %}
+            No matching metadata records found - new items will be created.
+            {% endif %}
+          <ul class="well">
       {% for field in form.visible_fields %}
         <li class="form">
         {# Include the hidden fields in the form #}
