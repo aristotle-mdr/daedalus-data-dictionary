@@ -250,7 +250,7 @@ class DataDictionaryUploader(SessionWizardView):
                     context="Column name: %s"%values['column'],
                     # preferred_column_name=values['column']
                 )
-            if self.get_cleaned_data_for_step('0')['distribution']:
+            if 'distribution' in self.get_cleaned_data_for_step('0').keys():
                 try:
                     from aristotle_dse.models import DistributionDataElementPath
                     ddep = DistributionDataElementPath.objects.create(

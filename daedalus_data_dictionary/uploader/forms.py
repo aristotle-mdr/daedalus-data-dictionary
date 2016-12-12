@@ -258,7 +258,6 @@ class DataDictionaryUploader_Part3_ConfirmStuff(forms.Form):
             self.fields.pop('object_name')
             self.fields.pop('property_name')
         else:
-            print "3", self.selected
             if self.selected.get('value_domain'):
                 self.fields.pop('value_domain_description')
                 self.fields.pop('maximum_length')
