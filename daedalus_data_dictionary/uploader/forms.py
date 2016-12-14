@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse_lazy
 
 import csv
 from aristotle_mdr.contrib.autocomplete import widgets
-from daedalus_data_dictionary.uploader import utils 
+from daedalus_data_dictionary.uploader import utils
 
 class DataDictionaryUploader_Part1_NameAndUpload(forms.Form):
     name = forms.CharField(
@@ -20,7 +20,7 @@ class DataDictionaryUploader_Part1_NameAndUpload(forms.Form):
     data_dictionary = forms.FileField(help_text=_("Select a data dictionary CSV file to upload."))
     definition = forms.CharField(
         widget=forms.Textarea, required=False,
-        help_text=_('Give a breif description of the data dictionary')
+        help_text=_('Give a brief description of the data dictionary')
     )
     distribution = forms.BooleanField(
         label=_("We're going to override this"),
@@ -58,8 +58,13 @@ class DynamicConceptAutocompleteSelect(ModelSelect2):
         )
         super(DynamicConceptAutocompleteSelect, self).__init__(*args, **kwargs)
 
-
 class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
+
+    # Force the media to load in case none of the fields are present
+    class Media(ModelSelect2):
+        css = ModelSelect2.Media.css
+        js = ModelSelect2.Media.js
+
     nope = forms.BooleanField(
         label=_("Skip this row"),
         help_text=_('Select to ignore his row when adding metadata from this dictionary.'),
@@ -88,17 +93,18 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
 
     def __init__(self, *args, **kwargs):
         from aristotle_mdr import models
-
         self.row = kwargs.pop('row')
         self.user = kwargs.pop('user')
+        step = kwargs.pop('step', None)
+        print("STEP IS", step)
         super(DataDictionaryUploader_Part2_MatchingStuff, self).__init__(*args, **kwargs)
-        
+
         de_qs = utils.data_dictionary_to_data_element_queryset(__user__=self.user, **self.row)
         oc_qs = utils.data_dictionary_to_object_class_queryset(__user__=self.user, **self.row)
         vd_qs = utils.data_dictionary_to_value_domain_queryset(__user__=self.user, **self.row)
         pr_qs = utils.data_dictionary_to_property_queryset(__user__=self.user, **self.row)
         dt_qs = utils.data_dictionary_to_datatype_queryset(__user__=self.user, **self.row)
-        
+
         if de_qs:
             self.fields['data_element'] = forms.ModelChoiceField(
                 queryset=de_qs,
@@ -126,7 +132,7 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
                     qs_uuid=utils.register_queryset(oc_qs),
                     model=models.ObjectClass
                 ),
-                initial=oc_qs.first().pk
+                initial=oc_qs.first().pk if oc_qs.first() else None
             )
         else:
             self.fields.pop('object_class')
@@ -142,7 +148,7 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
                     qs_uuid=utils.register_queryset(pr_qs),
                     model=models.Property
                 ),
-                initial=pr_qs.first().pk
+                initial=pr_qs.first().pk if pr_qs.first() else None
             )
         else:
             self.fields.pop('property')
@@ -158,7 +164,7 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
                     qs_uuid=utils.register_queryset(dt_qs),
                     model=models.DataType
                 ),
-                initial=dt_qs.first().pk
+                initial=dt_qs.first().pk if dt_qs.first() else None
             )
         else:
             self.fields.pop('data_type')
@@ -174,7 +180,7 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
                     qs_uuid=utils.register_queryset(vd_qs),
                     model=models.ValueDomain
                 ),
-                initial=vd_qs.first().pk
+                initial=vd_qs.first().pk if vd_qs.first() else None
             )
         else:
             self.fields.pop('value_domain')
@@ -191,6 +197,9 @@ class DataDictionaryUploader_Part2_MatchingStuffFormSet(BaseFormSet):
     def __init__(self, *args, **kwargs):
         self.rows = kwargs.pop('rows')
         self.user = kwargs.pop('user')
+        step = kwargs.pop('step', None)
+        print("FS: --- STEP IS", step)
+
         super(DataDictionaryUploader_Part2_MatchingStuffFormSet, self).__init__(*args, **kwargs)
 
     @cached_property
