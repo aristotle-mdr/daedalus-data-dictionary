@@ -15,7 +15,7 @@ setup(
     license='BSD Licence',
     description='',
     long_description=README,
-    url='https://github.com/aristotle-mdr/aristotle-daedalus-data-dictionary',
+    url='https://github.com/aristotle-mdr/daedalus-data-dictionary',
     author='Samuel Spencer',
     author_email='sam@sqbl.org',
     classifiers=[
