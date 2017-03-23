@@ -1,4 +1,5 @@
-import pickle
+#import pickle
+import dill as pickle
 from django.core.cache import cache
 from django.db.models import Q
 from aristotle_mdr.forms.search import PermissionSearchQuerySet as PSQS

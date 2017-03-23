@@ -20,7 +20,7 @@ class DataDictionaryUploader_Part1_NameAndUpload(forms.Form):
     data_dictionary = forms.FileField(help_text=_("Select a data dictionary CSV file to upload."))
     definition = forms.CharField(
         widget=forms.Textarea, required=False,
-        help_text=_('Give a breif description of the data dictionary')
+        help_text=_('Give a brief description of the data dictionary')
     )
     distribution = forms.BooleanField(
         label=_("We're going to override this"),

@@ -29,7 +29,8 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
     install_requires = [
-        'aristotle-metadata-registry>=1.4.0'
+        'aristotle-metadata-registry>=1.4.0',
+        'dill'
     ]
 
 )
