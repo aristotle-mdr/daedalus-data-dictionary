@@ -21,7 +21,7 @@
 {% block content %}
 <h1>Congratulations your data dictionary has been uploaded!</h1>
 
-<p>You can view your metadata <a href="">in your sandbox</a> and a preview of it appears below:</p>
+<p>You can view your metadata <a href="/account/sandbox">in your sandbox</a> and a preview of it appears below:</p>
 
 <blockquote>
     <h3><a href="{{saved_details.data_dictionary.get_absolute_url}}">{{ saved_details.data_dictionary.name}}</a></h3>
@@ -59,7 +59,7 @@
     </li>
     {% endif %}
     {% endwith %}
-    
+
     {% with oc_count=saved_details.object_classes|length %}
     {% if oc_count > 0 %}
     <li>{{oc_count}} Object Class{{oc_count|pluralize:"es"}}</li>

@@ -54,7 +54,7 @@ class DataDictionaryUploader(SessionWizardView):
             # The row is all blank, ignore it
             if not all(map(lambda y: y.strip() == "", row.values()))
         ]
-            
+
         # Skip header (its mandatory)
         return reader[1:]
 
@@ -70,6 +70,7 @@ class DataDictionaryUploader(SessionWizardView):
                 help_texts.append(row['name'])
                 rows.append(row)
             kwargs.update({'rows':rows})
+            kwargs.update({'step':step})
         elif int(step) == 2:
             kwargs.update({
                 'selected':self.get_cleaned_data_for_step('1'),
@@ -96,7 +97,7 @@ class DataDictionaryUploader(SessionWizardView):
             for row in self.get_dict_from_file():
                 initial.append(row)
         return initial
-    
+
     #@transaction.atomic
     def done(self, form_list, **kwargs):
         # Objects that were created during the wizard
@@ -109,11 +110,11 @@ class DataDictionaryUploader(SessionWizardView):
             'data_element_concepts':[],
         }
         # Now, lets save everything!
-        
+
         if 'daedalus_data_dictionary.storage' in settings.INSTALLED_APPS:
             from daedalus_data_dictionary.storage import models as DDM
             dd = DDM.DataDictionary.objects.create(
-                name = self.get_cleaned_data_for_step('0')['name'], 
+                name = self.get_cleaned_data_for_step('0')['name'],
                 definition = self.get_cleaned_data_for_step('0')['definition'],
                 origin_file = self.storage.get_step_files('0')['0-data_dictionary'],
                 submitter=self.request.user
@@ -121,7 +122,7 @@ class DataDictionaryUploader(SessionWizardView):
             details['data_dictionary'] = dd
         else:
             details['data_dictionary'] = {
-                'name': self.get_cleaned_data_for_step('0')['name'], 
+                'name': self.get_cleaned_data_for_step('0')['name'],
                 'definition': self.get_cleaned_data_for_step('0')['definition'],
             }
 
@@ -133,7 +134,7 @@ class DataDictionaryUploader(SessionWizardView):
             'data_elements':{},
             'data_element_concepts':{},
         }
-        
+
         from aristotle_mdr import models
         for elems, values in zip(self.get_cleaned_data_for_step('1'),self.get_cleaned_data_for_step('2')):
             if elems.get('nope', False):
@@ -220,7 +221,7 @@ class DataDictionaryUploader(SessionWizardView):
                     dec.property = pr
                     dec.save()
                     details['data_element_concepts'].append(dec)
-                    
+
                     if values['name']:
                         de_name = values['name']
                     elif dt:
@@ -289,9 +290,9 @@ class DataDictionaryUploader(SessionWizardView):
 
         context.update({
             'percent_complete': 100*int(self.steps.step0) / int(self.steps.count),
-            
+
         })
-        
+
         return context
 
     @method_decorator(login_required)
