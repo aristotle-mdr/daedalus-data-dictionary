@@ -2,6 +2,7 @@
 import dill as pickle
 from django.core.cache import cache
 from django.db.models import Q
+from django.db import models
 from aristotle_mdr.forms.search import PermissionSearchQuerySet as PSQS
 from aristotle_mdr.models import DataElement, ObjectClass, Property, ValueDomain, DataType
 
@@ -160,7 +161,11 @@ def pickle_abstract_field(field):
         # class self.__class__, then update its dict with self.__dict__
         # values - so, this is very close to normal pickle.
         return _empty, (self.__class__,), self.__dict__
-    if self.model._deferred:
+    if ( # Django 1.8
+        hasattr(self.model, '_deferred') and self.model._deferred
+        ) or ( # Django 1.10
+        not hasattr(self.model, '_deferred') and self.model is models.DEFERRED
+        ):
         # Deferred model will not be found from the app registry. This
         # could be fixed by reconstructing the deferred model on unpickle.
         raise RuntimeError("Fields of deferred models can't be reduced")
