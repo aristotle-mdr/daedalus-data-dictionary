@@ -96,7 +96,6 @@ class DataDictionaryUploader_Part2_MatchingStuff(forms.Form):
         self.row = kwargs.pop('row')
         self.user = kwargs.pop('user')
         step = kwargs.pop('step', None)
-        print("STEP IS", step)
         super(DataDictionaryUploader_Part2_MatchingStuff, self).__init__(*args, **kwargs)
 
         de_qs = utils.data_dictionary_to_data_element_queryset(__user__=self.user, **self.row)

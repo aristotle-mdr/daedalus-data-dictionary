@@ -28,7 +28,7 @@ def data_dictionary_to_data_element_queryset(**kwargs):
     key = 'dd_uploader_qs__de__sq---%s-%s'%(user.pk,"_".join(tokens))
     qs = cache.get(key)
     if qs:
-        print "getting from cache"
+        # print("getting from cache")
         return pickle.loads(qs)
     cache.set(key, pickle.dumps(des), 500)
 
@@ -54,7 +54,7 @@ def data_dictionary_to_object_class_queryset(**kwargs):
     key = 'dd_uploader_qs__oc__sq---%s-%s'%(user.pk,"_".join(tokens))
     qs = cache.get(key)
     if qs:
-        print "getting from cache"
+        # print("getting from cache")
         return pickle.loads(qs)
 
     cache.set(key, pickle.dumps(des), 500)
@@ -81,7 +81,7 @@ def data_dictionary_to_property_queryset(**kwargs):
     key = 'dd_uploader_qs__pr__sq---%s-%s'%(user.pk,"_".join(tokens))
     qs = cache.get(key)
     if qs:
-        print "getting from cache"
+        # print("getting from cache")
         return pickle.loads(qs)
 
     cache.set(key, pickle.dumps(des), 500)
@@ -108,7 +108,7 @@ def data_dictionary_to_datatype_queryset(**kwargs):
     key = 'dd_uploader_qs__dt__sq---%s-%s'%(user.pk,"_".join(tokens))
     qs = cache.get(key)
     if qs:
-        print "getting from cache"
+        # print("getting from cache")
         return pickle.loads(qs)
 
     cache.set(key, pickle.dumps(des), 500)
@@ -132,7 +132,7 @@ def data_dictionary_to_value_domain_queryset(**kwargs):
     key = 'dd_uploader_qs__vd__sq---%s-%s'%(user.pk,"_".join(tokens))
     qs = cache.get(key)
     if qs:
-        print "getting from cache"
+        # print("getting from cache")
         return pickle.loads(qs)
 
     cache.set(key, pickle.dumps(vds), 500)

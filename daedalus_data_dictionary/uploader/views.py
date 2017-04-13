@@ -52,7 +52,7 @@ class DataDictionaryUploader(SessionWizardView):
         reader = [
             row for row in list(reader)
             # The row is all blank, ignore it
-            if not all(map(lambda y: y.strip() == "", row.values()))
+            if not all(map(lambda y: y is None or y.strip() == "", row.values()))
         ]
 
         # Skip header (its mandatory)
